@@ -1,0 +1,239 @@
+import React, { useState, useRef } from 'react';
+import { BookOpen, Clock, Calendar, User, Star, PenTool, MessageSquare, Download, CheckCircle2 } from 'lucide-react';
+
+const FeedbackGenerator = () => {
+  // 默认今天的日期
+  const today = new Date().toISOString().split('T')[0];
+
+  const [formData, setFormData] = useState({
+    date: today,
+    studentName: '',
+    mentorName: '',
+    duration: '1.5',
+    topic: '',
+    progress: '',
+    statusRating: 5,
+    statusComment: '',
+    homework: '',
+    note: ''
+  });
+
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const setRating = (rating) => {
+    setFormData(prev => ({ ...prev, statusRating: rating }));
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-100 p-4 md:p-8 font-sans flex flex-col md:flex-row gap-8 justify-center">
+      
+      {/* 左侧：填写表单区域 */}
+      <div className={`w-full max-w-md bg-white rounded-2xl shadow-xl p-6 h-fit ${isPreviewMode ? 'hidden md:block' : 'block'}`}>
+        <div className="flex items-center gap-2 mb-6 border-b pb-4">
+          <PenTool className="w-6 h-6 text-indigo-600" />
+          <h2 className="text-xl font-bold text-gray-800">填写反馈信息</h2>
+        </div>
+
+        <div className="space-y-4">
+          {/* 基本信息 */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-500 mb-1">日期</label>
+              <input type="date" name="date" value={formData.date} onChange={handleInputChange} className="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-500 mb-1">课时 (小时)</label>
+              <select name="duration" value={formData.duration} onChange={handleInputChange} className="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none">
+                <option value="1">1 小时</option>
+                <option value="1.5">1.5 小时</option>
+                <option value="2">2 小时</option>
+                <option value="2.5">2.5 小时</option>
+                <option value="3">3 小时</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+             <div>
+              <label className="block text-xs font-bold text-gray-500 mb-1">导师姓名</label>
+              <input type="text" name="mentorName" placeholder="例如：王颐旻" value={formData.mentorName} onChange={handleInputChange} className="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-500 mb-1">学生姓名</label>
+              <input type="text" name="studentName" placeholder="例如：陈小明" value={formData.studentName} onChange={handleInputChange} className="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none" />
+            </div>
+          </div>
+
+          {/* 进度 */}
+          <div>
+            <label className="block text-xs font-bold text-gray-500 mb-1">今日课题/进度 (Progress)</label>
+            <textarea name="progress" rows="3" placeholder="例如：讲解了一元二次方程的解法，完成了课本练习题。" value={formData.progress} onChange={handleInputChange} className="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+          </div>
+
+          {/* 状态 */}
+          <div>
+            <label className="block text-xs font-bold text-gray-500 mb-1">课堂状态 (Status)</label>
+            <div className="flex gap-2 mb-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button key={star} onClick={() => setRating(star)} type="button" className="focus:outline-none transition-transform hover:scale-110">
+                  <Star className={`w-6 h-6 ${star <= formData.statusRating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`} />
+                </button>
+              ))}
+            </div>
+            <input type="text" name="statusComment" placeholder="一句话评价状态，如：专注度很高，互动积极。" value={formData.statusComment} onChange={handleInputChange} className="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none" />
+          </div>
+
+          {/* 作业 */}
+          <div>
+            <label className="block text-xs font-bold text-gray-500 mb-1">作业布置 (Homework)</label>
+            <textarea name="homework" rows="3" placeholder="1. 背诵单词...&#10;2. 完成练习册..." value={formData.homework} onChange={handleInputChange} className="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none"></textarea>
+          </div>
+
+          {/* 寄语 */}
+          <div>
+            <label className="block text-xs font-bold text-gray-500 mb-1">导师寄语 (Optional)</label>
+            <input type="text" name="note" placeholder="例如：今天进步很大，继续加油！" value={formData.note} onChange={handleInputChange} className="w-full p-2 border rounded-lg bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none" />
+          </div>
+
+          {/* 移动端预览按钮 */}
+          <button 
+            onClick={() => setIsPreviewMode(true)}
+            className="w-full md:hidden bg-indigo-600 text-white py-3 rounded-xl font-bold shadow-lg mt-4"
+          >
+            生成预览卡片
+          </button>
+        </div>
+      </div>
+
+      {/* 右侧：预览卡片区域 */}
+      <div className={`w-full max-w-sm flex flex-col items-center ${isPreviewMode ? 'block' : 'hidden md:flex'}`}>
+        
+        {/* 卡片本体 - 这是一个可以直接截图的区域 */}
+        <div id="feedback-card" className="w-full bg-white rounded-none md:rounded-xl overflow-hidden shadow-2xl border border-gray-100 relative">
+          
+          {/* 顶部装饰条 */}
+          <div className="h-2 bg-gradient-to-r from-red-600 via-yellow-500 to-blue-600"></div>
+          
+          <div className="p-6 md:p-8 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]">
+            
+            {/* Header */}
+            <div className="text-center mb-6 border-b-2 border-dashed border-gray-200 pb-6">
+              <div className="flex justify-center items-center gap-2 mb-2">
+                <div className="bg-indigo-900 text-white p-1.5 rounded-lg">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <h1 className="text-lg font-bold text-gray-900 tracking-tight">Project Mentorship</h1>
+              </div>
+              <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold">Course Feedback Form</p>
+            </div>
+
+            {/* Meta Info Grid */}
+            <div className="grid grid-cols-2 gap-y-4 gap-x-2 mb-6 text-sm">
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400 font-bold uppercase mb-1 flex items-center gap-1"><Calendar className="w-3 h-3"/> 日期</span>
+                <span className="font-semibold text-gray-800">{formData.date || '2025-XX-XX'}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400 font-bold uppercase mb-1 flex items-center gap-1"><Clock className="w-3 h-3"/> 课时</span>
+                <span className="font-semibold text-gray-800">{formData.duration} 小时</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400 font-bold uppercase mb-1 flex items-center gap-1"><User className="w-3 h-3"/> 学生</span>
+                <span className="font-semibold text-gray-800">{formData.studentName || '学生姓名'}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400 font-bold uppercase mb-1 flex items-center gap-1"><CheckCircle2 className="w-3 h-3"/> 导师</span>
+                <span className="font-semibold text-gray-800">{formData.mentorName || '导师姓名'}</span>
+              </div>
+            </div>
+
+            {/* Main Content Sections */}
+            <div className="space-y-5">
+              
+              {/* Progress */}
+              <div className="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                <h3 className="text-blue-800 font-bold text-sm mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600"></span> 教学进度
+                </h3>
+                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {formData.progress || '暂无进度描述...'}
+                </p>
+              </div>
+
+              {/* Status */}
+              <div className="bg-orange-50 p-4 rounded-xl border border-orange-100">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-orange-800 font-bold text-sm flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-orange-600"></span> 课堂状态
+                  </h3>
+                  <div className="flex gap-0.5">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <Star key={star} className={`w-3.5 h-3.5 ${star <= formData.statusRating ? 'fill-orange-400 text-orange-400' : 'text-gray-300'}`} />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {formData.statusComment || '暂无状态描述...'}
+                </p>
+              </div>
+
+              {/* Homework */}
+              <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                <h3 className="text-gray-700 font-bold text-sm mb-2 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-500"></span> 作业布置
+                </h3>
+                <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-wrap font-mono">
+                  {formData.homework || '无作业'}
+                </p>
+              </div>
+
+            </div>
+
+            {/* Footer / Note */}
+            <div className="mt-6 pt-4 border-t border-gray-100 text-center">
+              <p className="text-indigo-600 font-medium text-sm italic">
+                "{formData.note || 'Keep Learning, Keep Growing!'}"
+              </p>
+              <div className="mt-4 flex justify-center items-center gap-2 opacity-50">
+                 <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span className="text-[10px] font-bold">GZ</span>
+                 </div>
+                 <div className="text-[10px] text-gray-400 text-left leading-tight">
+                    HKUST(GZ)<br/>Project Mentorship
+                 </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* 提示信息 */}
+        <div className="mt-6 text-center">
+           {isPreviewMode && (
+            <button 
+              onClick={() => setIsPreviewMode(false)}
+              className="mb-4 bg-gray-200 text-gray-700 px-6 py-2 rounded-full font-bold text-sm md:hidden"
+            >
+              返回修改
+            </button>
+           )}
+          <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
+            <Download className="w-4 h-4" /> 
+            请直接截图上方卡片发送给项目组
+          </p>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default FeedbackGenerator;
